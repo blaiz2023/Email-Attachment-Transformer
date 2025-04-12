@@ -1,7 +1,7 @@
 # Email-Attachment-Transformer
 Can't email your important files through?  Tired of being messed about?  Then pack them inside an image with Email Attachment Transformer and send them off.
 
-(eat-screenshot5.gif)
+<img src="eat-screenshot5.gif">
 
 # Features
 * Various pack options: Pack folder files (all files in a folder), pack folder files and sub-folders (all files in a folder and it's sub-folders), or pack dropped files
