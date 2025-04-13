@@ -25,3 +25,5 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 <img src="eat-screenshot3.jpg">
 
 <img src="eat-screenshot4.jpg">
+
+<img src="eat-screenshot5.gif">
