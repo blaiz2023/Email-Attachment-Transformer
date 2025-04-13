@@ -16,6 +16,7 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 * Both sender and recipient require a copy of Email Attachment Transformer
 * Options Window - Easily change app color, font and settings
 * Portable
+* <a href="https://blaizenterprises.com/eat.html">Email Attachment Transformer Product Page</a>
 
 <img src="eat-screenshot.jpg">
 
