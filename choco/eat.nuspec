@@ -31,7 +31,7 @@ Features
     <copyright>2025 Blaiz Enterprises</copyright>
     <tags>pack files inside lossless bitmap image email attachment</tags>
     <projectSourceUrl>https://github.com/blaiz2023/Email-Attachment-Transformer</projectSourceUrl>
-    <packageSourceUrl>https://github.com/blaiz2023/Email-Attachment-Transformer/blob/main/misc/eat.2.0.800.nupkg</packageSourceUrl>
+    <packageSourceUrl>https://github.com/blaiz2023/Email-Attachment-Transformer/tree/main/choco</packageSourceUrl>
     <docsUrl>https://www.blaizenterprises.com/eat.html#help</docsUrl>
     <bugTrackerUrl>https://blaizenterprises.com/contact.html</bugTrackerUrl>
   </metadata>
