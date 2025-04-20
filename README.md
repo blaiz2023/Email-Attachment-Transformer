@@ -4,7 +4,6 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 <img src="eat-animated.gif">
 
 # Features
-* Version 2.00.800
 * Various pack options: Pack folder files (all files in a folder), pack folder files and sub-folders (all files in a folder and it's sub-folders), or pack dropped files
 * Store upto 50 MB of files (more with compression)
 * Pack fast and without fuss with auto clear.  Previous content is wiped and new content packed cleanly with no need to reset, clear or start afresh between packs.
@@ -17,7 +16,6 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 * Both sender and recipient require a copy of Email Attachment Transformer
 * Options Window - Easily change app color, font and settings
 * Portable
-* <a href="https://blaizenterprises.com/eat.html">Email Attachment Transformer Product Page</a>
 
 <img src="eat-screenshot.jpg">
 
