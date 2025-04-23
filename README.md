@@ -18,7 +18,7 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 * Portable
 
 # Download
-<a href="src/eat.exe">eat.exe</a>
+<a href="src/eat.exe">eat.exe</a> (Windows All)
 
 # Images
 <img src="images/eat-screenshot.jpg">
