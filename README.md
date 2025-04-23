@@ -1,7 +1,7 @@
 # Email Attachment Transformer
 Can't email your important files through?  Tired of being messed about?  Then pack them inside an image with Email Attachment Transformer and send them off.
 
-<img src="eat-animated.gif">
+<img src="images/eat-animated.gif">
 
 # Features
 * Various pack options: Pack folder files (all files in a folder), pack folder files and sub-folders (all files in a folder and it's sub-folders), or pack dropped files
@@ -17,12 +17,12 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 * Options Window - Easily change app color, font and settings
 * Portable
 
-<img src="eat-screenshot.jpg">
+<img src="images/eat-screenshot.jpg">
 
-<img src="eat-screenshot2.jpg">
+<img src="images/eat-screenshot2.jpg">
 
-<img src="eat-screenshot3.jpg">
+<img src="images/eat-screenshot3.jpg">
 
-<img src="eat-screenshot4.jpg">
+<img src="images/eat-screenshot4.jpg">
 
-<img src="eat-screenshot5.gif">
+<img src="images/eat-screenshot5.gif">
