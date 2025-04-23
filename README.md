@@ -17,8 +17,10 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 * Options Window - Easily change app color, font and settings
 * Portable
 
-Download <a href="src/eat.exe">eat.exe</a>
+# Download
+<a href="src/eat.exe">eat.exe</a>
 
+# Images
 <img src="images/eat-screenshot.jpg">
 
 <img src="images/eat-screenshot2.jpg">
