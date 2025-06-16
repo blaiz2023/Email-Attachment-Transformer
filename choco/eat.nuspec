@@ -2,17 +2,17 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>eat</id>
-    <version>2.0.800</version>
+    <version>2.0.810</version>
     <title>Email Attachment Transformer</title>
     <authors>Blaiz Enterprises</authors>
     <owners>Blaiz Enterprises</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <licenseUrl>https://opensource.org/license/mit</licenseUrl>
+    <licenseUrl>https://www.blaizenterprises.com/eat.html#help--mit-license</licenseUrl>
     <projectUrl>https://www.blaizenterprises.com/eat.html</projectUrl>
     <iconUrl>https://rawcdn.githack.com/blaiz2023/Email-Attachment-Transformer/2bb20d772fb437da6c18d75813aae452d6ceb500/images/eat-256.png</iconUrl>
     <description>Can't email your important files through?  Tired of being messed about?  Then pack them inside an image with Email Attachment Transformer and send them off.
 
-![Email Attachment Transformer v2.0.800 Screenshot](https://rawcdn.githack.com/blaiz2023/Email-Attachment-Transformer/2bb20d772fb437da6c18d75813aae452d6ceb500/images/eat-animated.gif)
+![Email Attachment Transformer v2.0.810 Screenshot](https://rawcdn.githack.com/blaiz2023/Email-Attachment-Transformer/d6cc0c411d8fa35680e7d6ceb93082b83e300ddd/images/eat-screenshot-2.0.810.jpg)
 
 Features
 * Various pack options: Pack folder files (all files in a folder), pack folder files and sub-folders (all files in a folder and its sub-folders), or pack dropped files
