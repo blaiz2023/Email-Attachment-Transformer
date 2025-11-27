@@ -1,4 +1,4 @@
-# Email Attachment Transformer
+# Email Attachment Transformer v2.0.815 / 27nov2025 / MIT License
 Can't email your important files through?  Tired of being messed about?  Then pack them inside an image with Email Attachment Transformer and send them off.
 
 <img src="images/eat-screenshot.jpg">
@@ -16,9 +16,10 @@ Can't email your important files through?  Tired of being messed about?  Then pa
 * Both sender and recipient require a copy of Email Attachment Transformer
 * Options Window - Easily change app color, font and settings
 * Portable
+* Smart Source Code (Borland Delphi 3 and Lazarus 2)
 
 # Download
-<a href="src/eat.exe">eat.exe</a> - windows all
+Download <a href="src/eat.exe">eat.exe</a> or from the "<a href="bin/">bin</a>" or "<a href="src/">src</a>" folders above.
 
 # Images
 <img src="images/eat-screenshot2.jpg">
