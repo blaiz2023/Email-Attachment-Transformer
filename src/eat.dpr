@@ -13,11 +13,13 @@ uses
   gosszip in 'gosszip.pas',
   gossjpg in 'gossjpg.pas';
 
-//{$R *.RES}
 //include multi-format icon - Delphi 3 can't compile an icon of 256x256 @ 32 bit -> resource error/out of memory error - 19nov2024
-{$R eat-16-256.res}//17jun2025
+{$R eat-256.res}
+
+//include app version information
+{$R ver.res}
 
 begin
-//(1)false=event driven disabled, (2)false=file handle caching disabled, (3)true=gui app mode
+//(1)true=timer event driven and false=direct processing, (2)false=file handle caching disabled, (3)true=gui app mode
 app__boot(true,false,not isconsole);
 end.

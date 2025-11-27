@@ -29,10 +29,10 @@ uses gossroot, {$ifdef gui}gossgui,{$endif} {$ifdef snd}gosssnd,{$endif} gosswin
 //##
 //## ==========================================================================================================================================================================================================================
 //## Library.................. app code (main.pas)
-//## Version.................. 2.00.810 (+10)
-//## Items.................... 4
-//## Last Updated ............ 17jun2025, 13apr2025
-//## Lines of Code............ 1,600+
+//## Version.................. 2.00.815 (+10)
+//## Items.................... 1
+//## Last Updated ............ 27nov2025, 17jun2025, 13apr2025
+//## Lines of Code............ 1,700+
 //##
 //## main.pas ................ app code
 //## gossroot.pas ............ console/gui app startup and control
@@ -47,7 +47,7 @@ uses gossroot, {$ifdef gui}gossgui,{$endif} {$ifdef snd}gosssnd,{$endif} gosswin
 //## ==========================================================================================================================================================================================================================
 //## | Name                   | Hierarchy         | Version   | Date        | Update history / brief description of function
 //## |------------------------|-------------------|-----------|-------------|--------------------------------------------------------
-//## | tapp                   | tbasicapp         | 2.00.800  | 13apr2025   | Email Attachment Transformer
+//## | tapp                   | tbasicapp         | 2.00.805  | 27nov2025   | Email Attachment Transformer - 13apr2025
 //## ==========================================================================================================================================================================================================================
 //## Performance Note:
 //##
@@ -68,16 +68,18 @@ type
 {tapp}
    tapp=class(tbasicapp)
    private
+
     itimerfast,itimer500:comp;
     iloaded,ibuildingcontrol:boolean;
     isettingsref,icolor,ilastsavefile,ilastopenfile,ilastopenfolder:string;
-    ilastopenfilterindex:longint;
+    ipopshowDelay,ilastopenfilterindex:longint;
     iscreen:tbasiccontrol;
     iv:tbasicscrollbar;
     iimage,itemp:trawimage;
     itempfiledata:tstr8;
     idownvpos,ifilecount,isizelimit,ilastpos:longint;
     idellist,ipacklist:tdynamicstring;
+
     procedure xcmd(sender:tobject;xcode:longint;xcode2:string);
     procedure __onclick(sender:tobject);
     procedure __ontimer(sender:tobject); override;
@@ -94,6 +96,9 @@ type
     procedure xsync;
     procedure xupdatebuttons;
     function xsize:longint;
+    function xempty:boolean;
+    function xcanclear:boolean;
+    procedure xclear;
     procedure xpack(xpacklist:tdynamicstring;xsubfolders:boolean);
     function popsaveimg(var xfilename:string;xcommonfolder,xtitle2:string;var daction:string):boolean;//18jun2021, 12apr2021
     function popopenimg(var xfilename:string;var xfilterindex:longint;xcommonfolder:string):boolean;//12apr2021
@@ -106,12 +111,17 @@ type
     procedure xloadit_dontpackit;
     procedure setcolor(x:string);
     function xcolorlabel:string;
+    procedure xcopybase64(dext:string);//27nov2025
+
    public
+
     //create
     constructor create; virtual;
     destructor destroy; override;
+
     //information
     property color:string read icolor write setcolor;//pack color
+
    end;
 
 //info procs -------------------------------------------------------------------
@@ -167,10 +177,12 @@ xname:=strlow(xname);
 
 //get
 if      (xname='slogan')              then result:=info__app('name')+' by Blaiz Enterprises'
-else if (xname='width')               then result:='1300'
-else if (xname='height')              then result:='700'
-else if (xname='ver')                 then result:='2.00.810'
-else if (xname='date')                then result:='17jun2025'
+else if (xname='width')               then result:='1350'
+else if (xname='height')              then result:='800'
+else if (xname='language')            then result:='english-australia'//for Clyde - 14sep2025
+else if (xname='codepage')            then result:='1252'//for Clyde
+else if (xname='ver')                 then result:='2.00.815'
+else if (xname='date')                then result:='27nov2025'
 else if (xname='name')                then result:='Email Attachment Transformer'
 else if (xname='web.name')            then result:='eat'//used for website name
 else if (xname='des')                 then result:='Pack files into an image for sending via email'
@@ -181,7 +193,7 @@ else if (xname='service.name')        then result:=info__app('name')
 else if (xname='service.displayname') then result:=info__app('service.name')
 else if (xname='service.description') then result:=info__app('des')
 else if (xname='new.instance')        then result:='1'//1=allow new instance, else=only one instance of app permitted
-else if (xname='screensizelimit%')    then result:='95'//95% of screen area
+else if (xname='screensizelimit%')    then result:='98'//98% of screen area
 else if (xname='realtimehelp')        then result:='0'//1=show realtime help, 0=don't
 else if (xname='hint')                then result:='1'//1=show hints, 0=don't
 
@@ -194,7 +206,6 @@ else if (xname='author.name')         then result:='Blaiz Enterprises'
 else if (xname='portal.name')         then result:='Blaiz Enterprises - Portal'
 else if (xname='portal.tep')          then result:=intstr32(tepBE20)
 //.software
-else if (xname='software.tep')        then result:=intstr32(low__aorb(tepNext20,tepIcon20,sizeof(program_icon20h)>=2))
 else if (xname='url.software')        then result:='https://www.blaizenterprises.com/'+info__app('web.name')+'.html'
 else if (xname='url.software.zip')    then result:='https://www.blaizenterprises.com/'+info__app('web.name')+'.zip'
 //.urls
@@ -212,44 +223,6 @@ else if (xname='license')             then result:='MIT License'
 else if (xname='copyright')           then result:='© 1997-'+low__yearstr(2025)+' Blaiz Enterprises'
 else if (xname='splash.web')          then result:='Web Portal: '+app__info('url.portal')
 
-//.program values -> defaults and fallback values
-else if (xname='focused.opacity')     then result:='255'//range: 50..255
-else if (xname='unfocused.opacity')   then result:='255'//range: 30..255
-else if (xname='opacity.speed')       then result:='9'//range: 1..10 (1=slowest, 10=fastest)
-
-else if (xname='head.center')         then result:='0'//1=center window title, 0=left align window title
-else if (xname='head.align')          then result:='1'//0=left, 1=center, 2=right -> head based toolbar alignment
-else if (xname='high.above')          then result:='0'//highlight above, 0=off, 1=on
-
-else if (xname='modern')              then result:='1'//range: 0=legacy, 1=modern
-else if (xname='scroll.size')         then result:='20'//scrollbar size: 5..72
-
-else if (xname='bordersize')          then result:='7'//0..72 - frame size
-else if (xname='sparkle')             then result:='7'//0..20 - default sparkle level -> set 1st time app is run, range: 0-20 where 0=off, 10=medium and 20=heavy)
-else if (xname='brightness')          then result:='100'//60..130 - default brightness
-
-else if (xname='ecomode')             then result:='0'//1=economy mode on, 0=economy mode off
-else if (xname='emboss')              then result:='0'//0=off, 1=on
-else if (xname='color.name')          then result:='black 8'//white 5'//default color scheme name
-else if (xname='back.name')           then result:=''//default background name
-else if (xname='frame.name')          then result:='narrow'//default frame name
-else if (xname='frame.max')           then result:='1'//0=no frame when maximised, 1=frame when maximised
-//.font
-else if (xname='font.name')           then result:='Arial'//default GUI font name
-else if (xname='font.size')           then result:='10'//default GUI font size
-//.font2
-else if (xname='font2.use')           then result:='1'//0=don't use, 1=use this font for text boxes (special cases)
-else if (xname='font2.name')          then result:='Courier New'
-else if (xname='font2.size')          then result:='12'
-//.help
-else if (xname='help.maxwidth')       then result:='500'//pixels - right column when help shown
-
-//.paid/store support
-else if (xname='paid')                then result:='0'//desktop paid status ->  programpaid -> 0=free, 1..N=paid - also works inconjunction with "system_storeapp" and it's cost value to determine PAID status is used within help etc
-else if (xname='paid.store')          then result:='1'//store paid status
-//.anti-tamper programcode checker - updated dual version (program EXE must be secured using "Blaiz Tools") - 11oct2022
-else if (xname='check.mode')          then result:='-91234356'//disable check
-//else if (xname='check.mode')          then result:='234897'//enable check
 else
    begin
    //nil
@@ -949,46 +922,53 @@ if system_debug then dbstatus(38,'Debug 010 - 21may2021_528am');//yyyy
 
 //self
 inherited create(strint32(app__info('width')),strint32(app__info('height')),true);
-ibuildingcontrol:=true;
-iloaded:=false;
+
+ibuildingcontrol     :=true;
 
 //init
-itimer500:=ms64;
-itimerfast:=ms64;
+itimer500            :=ms64;
+itimerfast           :=ms64;
 
 //vars
-iloaded:=false;
-ilastpos:=0;
-ifilecount:=0;
-idownvpos:=0;
+iloaded              :=false;
+ipopshowDelay        :=2;//2 seconds - 27nov2025
+ilastpos             :=0;
+ifilecount           :=0;
+idownvpos            :=0;
 
-ilastopenfolder:='';
-ilastsavefile:='untitled.bmp';
-ilastopenfile:='';
-ilastopenfilterindex:=0;
+ilastopenfolder      :='';
+ilastsavefile        :='untitled.bmp';
+ilastopenfile        :='';
+ilastopenfilterindex :=0;
 
-iimage:=misraw24(1,1);
-itemp:=misraw24(1,1);
-isizelimit:=50*1000*1000;
-ipacklist:=tdynamicstring.create;
-idellist :=tdynamicstring.create;
-itempfiledata:=str__new8;
-icolor:='';
-isettingsref:='';
+iimage               :=misraw24(1,1);
+itemp                :=misraw24(1,1);
+isizelimit           :=50*1000*1000;
+ipacklist            :=tdynamicstring.create;
+idellist             :=tdynamicstring.create;
+itempfiledata        :=str__new8;
+icolor               :='';
+isettingsref         :='';
 
 //controls
 with rootwin do
 begin
-scroll:=false;
+
+scroll               :=false;
 xhead;
 xgrad;
 xgrad2;
-xstatus2.cellwidth[0]:=170;
-xstatus2.cellwidth[1]:=100;
+
+//.status cells
+xstatus2.cellwidth[0]:=190;
+
+xstatus2.cellwidth[1]:=120;
+
 xstatus2.cellwidth[2]:=110;
 xstatus2.cellhelp [2]:='Color | Click to set color for header and footer | Color change takes effect on next pack';
+
 xstatus2.cellwidth[3]:=100;
-xstatus2.celltext[3]:='Pack files inside an image for transmission as an email attachment';
+xstatus2.celltext[3] :=#32+'Pack files inside an image for transmission as an email attachment';
 xstatus2.cellalign[3]:=0;
 
 //.screen
@@ -1005,10 +985,12 @@ end;
 
 with rootwin do
 begin
+xhead.add('New',tepNew20,0,'new','New | Clear contents and start afresh');
 xhead.add('Pack',tepFolder20,0,'pack.folder','Pack | Pack folder files into an image');
 xhead.add('Pack (S)',tepFolder20,0,'pack.folder+subfolders','Pack | Pack folder files and sub-folders into an image');
 xhead.add('Save As',tepSave20,0,'save','Save | Save image with packed files to disk');
 xhead.add('Copy',tepCopy20,0,'copy','Copy | Copy image with packed files to Clipboard');
+xhead.add('PNG',tepCopy20,0,'copy.b64.png','Copy Image|Copy image to Clipboard as base64 encoded text in mime/type format PNG. Image data can be inserted into HTML code, or viewed by pasting it into your browser''s address bar.');//27nov2025
 xhead.addsep;
 
 xhead.add('Paste',tepPaste20,0,'paste','Paste | Paste image with packed files from Clipboard');
@@ -1022,33 +1004,34 @@ end;
 
 
 //default page to show
-rootwin.xhead.parentpage:='overview';
+rootwin.xhead.parentpage       :='overview';
 
 //events
-rootwin.xhead.onclick:=__onclick;
-rootwin.xhead.showmenuFill1:=xshowmenuFill1;
-rootwin.xhead.showmenuClick1:=xshowmenuClick1;
-rootwin.xhead.ocanshowmenu:=true;//use toolbar for special menu display - 18dec2021
-iscreen.onalign:=screen__onalign;
-iscreen.onpaint:=screen__onpaint;
-iscreen.onnotify:=screen__onnotify;
-iscreen.onaccept:=screen__onaccept;
-rootwin.xstatus2.clickcell:=status__onclickcell;
+rootwin.xhead.onclick          :=__onclick;
+rootwin.xhead.showmenuFill1    :=xshowmenuFill1;
+rootwin.xhead.showmenuClick1   :=xshowmenuClick1;
+rootwin.xhead.ocanshowmenu     :=true;//use toolbar for special menu display - 18dec2021
 
-//start timer event
-ibuildingcontrol:=false;
+iscreen.onalign                :=screen__onalign;
+iscreen.onpaint                :=screen__onpaint;
+iscreen.onnotify               :=screen__onnotify;
+iscreen.onaccept               :=screen__onaccept;
+rootwin.xstatus2.clickcell     :=status__onclickcell;
+
+//load settings
+ibuildingcontrol               :=false;
 xloadsettings;
-
-//defaults
 xsync;
 
-//finish
+//finish -> start timer etc
 createfinish;
+
 end;
 
 destructor tapp.destroy;
 begin
 try
+
 //settings
 xautosavesettings;
 
@@ -1061,6 +1044,7 @@ str__free(@itempfiledata);
 
 //self
 inherited destroy;
+
 except;end;
 end;
 
@@ -1125,12 +1109,16 @@ var
    //infovars
    a:tclientinfo;
    xenabled:boolean;
+
    //vars
-   fn2,fnH2,tw,dx,dw:longint;
+   dsize,fn2,fnH2,tw,dx,dw:longint;
    xcap:string;
+
 begin
 try
+
 //init
+dsize:=xsize;
 iscreen.infovars(a);
 
 //cls
@@ -1138,7 +1126,7 @@ iscreen.lds(area__make(a.cs.left,a.cs.top,iv.left-1,a.cs.bottom),int__splice24(0
 iscreen.lds(area__make(iv.left,a.cs.top,a.cs.right,a.cs.bottom),a.back,a.r);
 
 //text
-if (xsize<=0) then
+if (dsize<=0) then
    begin
    fn2:=low__font1(viFontname,round(viFontsize*1.5*vizoom),false);
    fnH2:=low__fontmaxh(fn2);
@@ -1153,7 +1141,8 @@ dw:=frcmax32(misw(iimage)*a.zoom,iv.left-1);
 dx:=frcmin32((iv.left-1-dw) div 2,0);
 
 //draw
-iscreen.ldc(a.ci,a.ci.left+dx,a.ci.top-ilastpos,dw,mish(iimage)*a.zoom,area__make(0,0,(dw div a.zoom)-1,mish(iimage)-1),iimage,255,0,clnone,0);
+if (dsize>=1) then iscreen.ldc(a.ci,a.ci.left+dx,a.ci.top-ilastpos,dw,mish(iimage)*a.zoom,area__make(0,0,(dw div a.zoom)-1,mish(iimage)-1),iimage,255,0,clnone,0);
+
 except;end;
 end;
 
@@ -1246,6 +1235,7 @@ var
    xok:boolean;
 begin
 try
+
 xok:=eat__unpack(itemp,'',true,xcount,xwriteerrs,e);
 
 if (xcount<=0) then m:='No files found.'
@@ -1260,10 +1250,28 @@ if (xcount>=1) then
    xsync;
    end;
 
-gui.popstatus(m,3);
+gui.popstatus(m,ipopshowDelay);
+
 except;end;
+
 //clear
 missize(itemp,1,1);
+
+end;
+
+function tapp.xcanclear:boolean;
+begin
+result:=not xempty;
+end;
+
+procedure tapp.xclear;
+begin
+
+missize(iimage,1,1);
+ifilecount  :=0;
+ilastpos    :=0;
+xsync;
+
 end;
 
 function tapp.xcanunpack:boolean;
@@ -1278,6 +1286,7 @@ var
    xok:boolean;
 begin
 try
+
 //check
 if not xcanunpack then exit;
 
@@ -1291,24 +1300,30 @@ else                m:=k64(xcount)+' file'+s(xcount)+' unpacked.' +insstr('  Som
 
 if (xcount<=0) then io__deletefolder(dfolder) else runLOW(dfolder,'');
 
-gui.popstatus(m,3);
+gui.popstatus(m,ipopshowDelay);
+
 except;end;
 end;
 
 procedure tapp.setcolor(x:string);
 begin
+
 x:=strlow(x);
 if (x<>'r') and (x<>'y') and (x<>'g') and (x<>'b') and (x<>'p') and (x<>'x') and (x<>'w') then x:='';
 icolor:=x;
 xsync;
+
 end;
 
 function tapp.xcolorlabel:string;
+
    procedure m(const n,x:string);
    begin
    if strmatch(n,icolor) then result:=x;
    end;
+
 begin
+
 m('r','Red');
 m('y','Yellow');
 m('g','Green');
@@ -1317,14 +1332,15 @@ m('p','Purple');
 m('x','Pink');
 m('w','White');
 m('','Default');
+
 end;
 
 procedure tapp.xpack(xpacklist:tdynamicstring;xsubfolders:boolean);
 var
    e:string;
 begin
-if (xpacklist=nil) and (not app__gui.popfolder2(ilastopenfolder,'*','',true,true)) then exit;
 
+if (xpacklist=nil) and (not app__gui.popfolder2(ilastopenfolder,'*','',true,true)) then exit;
 
 gui.popstatus(low__aorbstr('Packing...','Repacking...',(xsize>=1)),1);
 
@@ -1336,9 +1352,11 @@ end;//case
 ilastpos:=0;
 xsync;
 iscreen.paintnow;
+
 //clear
 str__clear(@itempfiledata);
 itempfiledata.tag1:=0;//not in use
+
 end;
 
 procedure tapp.xcmd(sender:tobject;xcode:longint;xcode2:string);
@@ -1355,6 +1373,7 @@ var
    end;
 begin//use for testing purposes only - 15mar2020
 try
+
 //defaults
 e:='';
 
@@ -1368,9 +1387,16 @@ if zzok(sender,7455) and (sender is tbasictoolbar) then
 
 if (xcode2='pack.folder') or (xcode2='pack.folder+subfolders') then xpack(nil,(xcode2='pack.folder+subfolders'))
 
+else if (xcode2='new') then xclear//27nov2025
+
 else if (xcode2='copy') then
    begin
-   if not clip__copyimage(iimage) then e:=gecTaskfailed;
+   if (not xempty) and (not clip__copyimage(iimage)) then e:=gecTaskfailed;
+   end
+
+else if (xcode2='copy.b64.png') then//27nov2025
+   begin
+   if (not xempty) then xcopybase64('png');
    end
 
 else if (xcode2='save') then
@@ -1416,43 +1442,62 @@ else e:='';//no error
 
 //successful
 skipend:
+
 except;end;
+
 //error
 if (e<>'') then gui.poperror('',e);
+
 //clear
 missize(itemp,1,1);
+
 end;
 
 function tapp.xsize:longint;
 begin
+
 if (mish(iimage)<=1) then result:=0
 else                      result:=misw(iimage)*mish(iimage)*3;
+
+end;
+
+function tapp.xempty:boolean;
+begin
+
+result:=(xsize<=0);
+
 end;
 
 procedure tapp.xupdatebuttons;
 var
-   dsize:longint;
+   dcancopy:boolean;
 begin
-rootwin.xhead.benabled2['paste']:=clip__canpasteimage;
-dsize:=xsize;
-rootwin.xhead.benabled2['copy']:=(dsize>=1);
-rootwin.xhead.benabled2['save']:=(dsize>=1);
-rootwin.xhead.benabled2['unpack']:=xcanunpack;
+
+dcancopy                                :=not xempty;
+
+rootwin.xhead.benabled2['new']          :=dcancopy;
+rootwin.xhead.benabled2['paste']        :=clip__canpasteimage;
+rootwin.xhead.benabled2['copy']         :=dcancopy;
+rootwin.xhead.benabled2['copy.b64.png'] :=dcancopy;
+rootwin.xhead.benabled2['save']         :=dcancopy;
+rootwin.xhead.benabled2['unpack']       :=xcanunpack;
+
 end;
 
 procedure tapp.xsync;
 var
    dsize:longint;
 begin
+
 iv.setparams2(ilastpos,0,frcmin32(mish(iimage)-32,0),false);
 
 dsize:=xsize;
-rootwin.xstatus2.celltext[0]:='Size '+low__mbb( frcmax32(dsize,isizelimit) ,2,true)+' of '+low__mbb(isizelimit,2,true);
+rootwin.xstatus2.celltext[0]:='Size: '+low__mbb( frcmax32(dsize,isizelimit) ,2,true)+' of '+low__mbb(isizelimit,2,true);
 rootwin.xstatus2.cellpert[0]:=low__ipercentage(dsize,isizelimit);
 
-rootwin.xstatus2.celltext[1]:='Files '+k64(ifilecount);
+rootwin.xstatus2.celltext[1]:='Files: '+k64(ifilecount);
 
-rootwin.xstatus2.celltext[2]:='Color ( '+xcolorlabel+' )';
+rootwin.xstatus2.celltext[2]:='Color: '+xcolorlabel;
 
 xupdatebuttons;
 iscreen.paintnow;
@@ -1633,6 +1678,7 @@ if mis__fromfile(itemp,df,e) then
    //.at least one file detected
    if (xcount>=1) then
       begin
+
       //ok to clear the pack list -> we've loaded the contents
       ipacklist.clear;
 
@@ -1642,13 +1688,74 @@ if mis__fromfile(itemp,df,e) then
       ifilecount:=xcount;
       ilastpos  :=0;
       xsync;
-      gui.popstatus(m,3);
+      gui.popstatus(m,ipopshowDelay);
+
       end;
    end;
 
 except;end;
 //clear
 missize(itemp,1,1);
+end;
+
+procedure tapp.xcopybase64(dext:string);//27nov2025
+label
+   skipend;
+var
+   xresult:boolean;
+   a:tbasicimage;
+   d:tstr8;
+   dtype,e:string;
+begin
+
+//defaults
+xresult :=false;
+d       :=nil;
+a       :=nil;
+e       :=gecTaskfailed;
+
+try
+//check
+if xempty then exit;
+
+//get
+d:=str__new8;
+
+if strmatch(dext,'gif') or strmatch(dext,'png') or strmatch(dext,'jpg')  then
+   begin
+
+   dtype  :=net__mimefind(dext);
+   a      :=misimg32(1,1);
+   if not mis__copy(iimage,a)              then goto skipend;
+   if not mis__todata(a,@d,dext,e)         then goto skipend;
+
+   end
+else
+   begin
+
+   e:=gecUnsupportedFormat;
+   goto skipend;
+
+   end;
+
+if not str__tob64(@d,@d,0)                 then goto skipend;
+if not d.sins('data:'+dtype+';base64,',0)  then goto skipend;
+if not clip__copytext(d.text)              then goto skipend;
+
+//successful
+xresult:=true;
+gui.popstatus(low__mbAUTO2(d.len,1,true)+' of text copied to Clipboard',1);
+
+skipend:
+except;end;
+
+//free
+str__free(@d);
+freeobj(@a);
+
+//show error
+if (not xresult) and (app__gui<>nil) then app__gui.poperror('',e);
+
 end;
 
 end.
